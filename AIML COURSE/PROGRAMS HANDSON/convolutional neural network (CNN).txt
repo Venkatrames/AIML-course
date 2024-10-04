@@ -1,0 +1,61 @@
+from sklearn.datasets import fetch_openml
+X,y=fetch_openml('mnist_784',version=1,return_X_y=True,as_frame=False)
+X
+y
+
+print(X.shape)
+print(y.shape)
+print(type(y[3]))
+
+import matplotlib
+import matplotlib.pyplot as plt
+
+n= 44
+some_digit = X[n].reshape(28, 28)
+plt.imshow(some_digit, cmap=matplotlib.cm.binary, interpolation='nearest')
+plt.axis('off')
+plt.show()
+print('The digit is %d' % int(y[n])) 
+
+import matplotlib
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(10, 5))
+for i in range(10):
+  plot = plt.subplot(2, 5, i +1)
+  plot.imshow(X[i].reshape(28, 28), interpolation='nearest', cmap=matplotlib.cm.binary)
+  plot.set_xticks(())
+  plot.set_yticks(())
+  plot.set_xlabel('Digit %s' % y[i])
+plt.suptitle('First ten digits')
+import numpy as np
+from sklearn.linear_model import SGDClassifier
+# split the data in to Train and Test sets
+X_Train, X_Test, y_Train, y_Test = X[:60000], X[60000:], y[:60000], y[60000:]
+# shuffle the training set to ensure that cross-validation folsds are similar
+shuffle_index = np.random.permutation(60000)
+X_Train, y_Train = X_Train[shuffle_index], y_Train[shuffle_index]
+#
+# binary classifier to recognize digit 5
+# target for digit-5 classification
+y_Train_5 = (y_Train == '5')
+y_Test_5 = (y_Test == '5')
+# Train the model using sgd classifier
+sgd_clf = SGDClassifier(random_state=42)
+sgd_clf.fit(X_Train, y_Train_5)
+
+print(y_Test[9998])
+sgd_clf.predict([X_Test[9998]])
+
+predictions = sgd_clf.predict(X_Test[1000:1010])
+plt.figure(figsize=(10, 5))
+for i in range(10):
+  plot = plt.subplot(2, 5, i +1)
+  plot.imshow(X_Test[i + 10].reshape(28, 28), interpolation='nearest', cmap=matplotlib.cm.binary)
+  plot.set_xticks(())
+  plot.set_yticks(())
+  plot.set_xlabel('prediction: %s' % predictions[i])
+  plt.suptitle('Digit 5 classifier')
+
+score = sgd_clf.score(X_Test, y_Test_5)
+score
